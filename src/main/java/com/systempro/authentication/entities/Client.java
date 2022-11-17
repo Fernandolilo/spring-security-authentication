@@ -1,6 +1,7 @@
 package com.systempro.authentication.entities;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,10 +14,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import com.systempro.authentication.entities.enums.Perfil;
 
 @Entity
-public class Client implements Serializable {
+public class Client implements UserDetails, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -26,7 +30,7 @@ public class Client implements Serializable {
 	private String cpf;
 	private String password;
 	private String email;
-	
+
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "PERFIS")
 	private Set<Integer> perfis = new HashSet<>();
@@ -43,10 +47,11 @@ public class Client implements Serializable {
 		this.email = email;
 		addPerfil(Perfil.USER);
 	}
-	
+
 	public void addPerfil(Perfil perfil) {
 		perfis.add(perfil.getCod());
 	}
+
 	public Set<Perfil> getPerfis() {
 		return perfis.stream().map(x -> Perfil.toEnum(x)).collect(Collectors.toSet());
 	}
@@ -75,10 +80,6 @@ public class Client implements Serializable {
 		this.cpf = cpf;
 	}
 
-	public String getPassword() {
-		return password;
-	}
-
 	public void setPassword(String password) {
 		this.password = password;
 	}
@@ -89,6 +90,46 @@ public class Client implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		
+		return null;
+	}
+
+	@Override
+	public String getUsername() {
+		return this.email;
+	}
+	
+	@Override
+	public String getPassword() {
+		return this.password;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		// TODO Auto-generated method stub
+		return true;
 	}
 
 }

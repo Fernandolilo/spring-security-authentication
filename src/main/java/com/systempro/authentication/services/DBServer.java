@@ -1,5 +1,6 @@
 package com.systempro.authentication.services;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.systempro.authentication.entities.Client;
@@ -10,14 +11,18 @@ public class DBServer {
 
 	private final ClientRepository repository;
 
-	public DBServer(ClientRepository repository) {
+	private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+	public DBServer(ClientRepository repository, BCryptPasswordEncoder bCryptPasswordEncoder) {
 		this.repository = repository;
+		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
 	}
 
 	public void initializerDB() {
 
-		Client cli = new Client(null, "Fernando da Silva", "12312312311", "1234", "fernando.silva@silva.com");
-
+		Client cli = new Client(null, "Fernando da Silva", "12312312311", bCryptPasswordEncoder.encode("1234"),
+				"fernando.silva@silva.com");
+		System.out.println("Senha: " + cli.getPassword());
 		repository.save(cli);
 	}
 
