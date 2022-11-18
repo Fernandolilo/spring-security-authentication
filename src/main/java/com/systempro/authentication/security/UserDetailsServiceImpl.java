@@ -1,5 +1,7 @@
 package com.systempro.authentication.security;
 
+import javax.transaction.Transactional;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -9,6 +11,7 @@ import com.systempro.authentication.entities.Users;
 import com.systempro.authentication.repositories.UserRepository;
 import com.systempro.authentication.services.exceptions.ObjectNotFoundException;
 
+@Transactional
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 

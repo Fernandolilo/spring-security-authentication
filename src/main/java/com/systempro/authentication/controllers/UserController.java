@@ -3,6 +3,7 @@ package com.systempro.authentication.controllers;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +22,11 @@ public class UserController {
 	}
 
 	@GetMapping
+	//libera apenas um ROLE especifico
+	//@PreAuthorize("hasRole('ROLE_ADMIN')")
+	
+	// libera acesso a varios ROLES
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN' , 'ROLE_USER')")
 	public ResponseEntity<List<Users>> findAll() {
 		List<Users> cli = service.findAll();
 		return ResponseEntity.ok().body(cli);
