@@ -1,7 +1,11 @@
 package com.systempro.authentication.security;
 
+import java.util.Arrays;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -11,18 +15,27 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfigV2 {
 
+	@Autowired
+	private Environment env;
+	
+	//liverado acesso ao banco de dados em ambiente de test
+	private static final String[] PUBLIC_MATCHERS = { 
+			"h2-console/**"
+	};
+
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-		http.httpBasic().and()
-		.authorizeHttpRequests()
-				// delegando o role aos controlers com o @PreAuthorize("hasRole('ROLE_ADMIN')")
-				/*
-				 * .antMatchers(HttpMethod.POST, "/authentication/login/**").permitAll()
-				 * .antMatchers(HttpMethod.GET, "/authentication/h2-console/**").permitAll()
-				 */
-				.anyRequest().authenticated()
-				.and().csrf().disable();
+		//test caso o ambiente seja de test libera o acesso ao h2
+		if (Arrays.asList(env.getActiveProfiles()).contains("test")) {
+			http.headers().frameOptions().disable();
+		}
+		
+		http.cors().and().csrf().disable();
+		http.authorizeRequests()
+
+				.antMatchers(PUBLIC_MATCHERS).permitAll().anyRequest().authenticated();
+
 		return http.build();
 	}
 
