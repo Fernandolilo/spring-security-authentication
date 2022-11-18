@@ -17,25 +17,22 @@ public class WebSecurityConfigV2 {
 
 	@Autowired
 	private Environment env;
-	
-	//liverado acesso ao banco de dados em ambiente de test
-	private static final String[] PUBLIC_MATCHERS = { 
-			"h2-console/**"
-	};
+
+	// liverado acesso ao banco de dados em ambiente de test
+	private static final String[] PUBLIC_MATCHERS = { "/h2-console/**" };
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-		//test caso o ambiente seja de test libera o acesso ao h2
+		// test caso o ambiente seja de test libera o acesso ao h2 if
 		if (Arrays.asList(env.getActiveProfiles()).contains("test")) {
 			http.headers().frameOptions().disable();
 		}
-		
-		http.cors().and().csrf().disable();
-		http.authorizeRequests()
 
-				.antMatchers(PUBLIC_MATCHERS).permitAll().anyRequest().authenticated();
-
+		http.httpBasic().and().authorizeHttpRequests()
+		//validando a liberação dos endpoints dentro de PUBLIC_MATCHERS
+		.antMatchers(PUBLIC_MATCHERS).permitAll().anyRequest()
+				.authenticated().and().csrf().disable();
 		return http.build();
 	}
 
@@ -43,5 +40,4 @@ public class WebSecurityConfigV2 {
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
 }
