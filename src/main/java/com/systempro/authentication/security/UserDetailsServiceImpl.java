@@ -5,24 +5,25 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.systempro.authentication.entities.Client;
-import com.systempro.authentication.repositories.ClientRepository;
+import com.systempro.authentication.entities.Users;
+import com.systempro.authentication.repositories.UserRepository;
 import com.systempro.authentication.services.exceptions.ObjectNotFoundException;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-	private final ClientRepository repository;
+	private final UserRepository repository;
 
-	public UserDetailsServiceImpl(ClientRepository repository) {
+	public UserDetailsServiceImpl(UserRepository repository) {
 		this.repository = repository;
 	}
 
 	// metodo responsavel por fazer a busca no banco de dados um usuario
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Client cli = repository.findByEmail(username).orElseThrow(() -> new ObjectNotFoundException("Email ou senha invalodos"));
-		return cli;
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+		Users cli = repository.findByEmail(email)
+				.orElseThrow(() -> new ObjectNotFoundException("Email ou senha invalodos"));
+		return new UserRole(cli.getId(), cli.getEmail(), cli.getPassword(), cli.getPerfis());
 	}
 
 }
